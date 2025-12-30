@@ -1,47 +1,54 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
-# Install required extensions
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     zip \
     unzip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-install pdo pdo_mysql
+    nginx \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project
+# Copy application files
 COPY . .
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies
+RUN composer install --no-dev --no-interaction --prefer-dist
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 storage bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
-
-# Configure Apache
-RUN echo '<Directory /var/www/html/public> \
-    AllowOverride All \
-    Require all granted \
-</Directory>' > /etc/apache2/conf-available/laravel.conf && \
-    a2enconf laravel && \
-    a2enmod rewrite
-
-# Set document root
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+# Create nginx config
+RUN mkdir -p /etc/nginx/sites-available && \
+    echo 'server { \
+        listen 8080; \
+        server_name _; \
+        root /var/www/html/public; \
+        index index.php; \
+        location / { \
+            try_files $uri $uri/ /index.php?$query_string; \
+        } \
+        location ~ \.php$ { \
+            fastcgi_pass 127.0.0.1:9000; \
+            fastcgi_index index.php; \
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \
+            include fastcgi_params; \
+        } \
+    }' > /etc/nginx/sites-available/default
 
 # Expose port
-EXPOSE 80
+EXPOSE 8080
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Start both PHP-FPM and nginx
+CMD ["sh", "-c", "php-fpm -D && nginx -g \"daemon off;\""]
+
