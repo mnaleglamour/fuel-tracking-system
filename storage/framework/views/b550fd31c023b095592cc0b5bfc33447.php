@@ -1,6 +1,6 @@
-@extends('layouts.app')
 
-@section('content')
+
+<?php $__env->startSection('content'); ?>
 
 <style>
     .sale-form-container {
@@ -89,39 +89,41 @@
     <div class="sale-card">
         <h2 class="sale-title">Record Sale</h2>
 
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+                <?php echo e(session('success')); ?>
 
-        @if(session('warning'))
+            </div>
+        <?php endif; ?>
+
+        <?php if(session('warning')): ?>
             <div class="alert-warning">
-                {{ session('warning') }}
-            </div>
-        @endif
+                <?php echo e(session('warning')); ?>
 
-        @if($errors->any())
+            </div>
+        <?php endif; ?>
+
+        <?php if($errors->any()): ?>
             <div class="alert-error">
                 <ul>
-                    @foreach($errors->all() as $error)
-                        <li>⚠ {{ $error }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li>⚠ <?php echo e($error); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
             </div>
-        @endif
+        <?php endif; ?>
 
-        <form action="{{ route('sales.store') }}" method="POST">
-            @csrf
+        <form action="<?php echo e(route('sales.store')); ?>" method="POST">
+            <?php echo csrf_field(); ?>
 
             <label>Select Pump</label>
             <select name="pump_id" required onchange="updatePumpInfo()">
                 <option value="">-- Select a pump --</option>
-                @foreach($pumps as $pump)
-                    <option value="{{ $pump->id }}" data-price="{{ $pump->price_per_litre }}" data-region="{{ $pump->region }}" data-fuel="{{ $pump->fuel_type }}" data-cap="{{ $pump->cap_price ?? 'N/A' }}">
-                        {{ $pump->name }} — {{ $pump->fuel_type }} — Stock: {{ $pump->stock ?? 'N/A' }} L
+                <?php $__currentLoopData = $pumps; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pump): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option value="<?php echo e($pump->id); ?>" data-price="<?php echo e($pump->price_per_litre); ?>" data-region="<?php echo e($pump->region); ?>" data-fuel="<?php echo e($pump->fuel_type); ?>" data-cap="<?php echo e($pump->cap_price ?? 'N/A'); ?>">
+                        <?php echo e($pump->name); ?> — <?php echo e($pump->fuel_type); ?> — Stock: <?php echo e($pump->stock ?? 'N/A'); ?> L
                     </option>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
 
             <div id="pumpInfo" style="display: none; margin-bottom: 16px; padding: 12px; background: #f0f9ff; border-left: 4px solid #2563eb; border-radius: 6px;">
@@ -177,4 +179,6 @@ function updatePumpInfo() {
 }
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\SHAYO\Desktop\laravel\tracking\resources\views/sales/create.blade.php ENDPATH**/ ?>
