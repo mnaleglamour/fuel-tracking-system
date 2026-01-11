@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::table('pumps', function (Blueprint $table) {
-            $table->dropForeign('pumps_fuel_id_foreign');
-            $table->dropColumn('fuel_id');
+            if (Schema::hasColumn('pumps', 'fuel_id')) {
+                $table->dropColumn('fuel_id');
+            }
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -23,8 +28,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pumps', function (Blueprint $table) {
-            $table->unsignedBigInteger('fuel_id')->nullable();
-            $table->foreign('fuel_id')->references('id')->on('fuels')->onDelete('cascade');
+            if (!Schema::hasColumn('pumps', 'fuel_id')) {
+                $table->unsignedBigInteger('fuel_id')->nullable();
+
+                $table->foreign('fuel_id')
+                      ->references('id')
+                      ->on('fuels')
+                      ->onDelete('cascade');
+            }
         });
     }
 };
