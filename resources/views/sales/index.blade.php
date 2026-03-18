@@ -1,75 +1,65 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-3">
+    <div>
+        <h1><i class="bi bi-graph-up me-2"></i>All Sales</h1>
+        <p>View and manage all recorded fuel sales</p>
+    </div>
+</div>
 
-<style>
-    /* Table hover effect */
-    table tbody tr:hover {
-        background-color: #f3f4f6; /* light gray */
-    }
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
-    /* Table header style */
-    table thead th {
-        background-color: #3b82f6; /* Tailwind blue-500 */
-        color: white;
-        text-align: left;
-    }
-
-    /* Pagination links */
-    .pagination li a,
-    .pagination li span {
-        padding: 0.5rem 0.75rem;
-        margin: 0 0.125rem;
-        border: 1px solid #d1d5db; /* Tailwind gray-300 */
-        border-radius: 0.375rem;
-        color: #3b82f6;
-    }
-
-    .pagination li.active span {
-        background-color: #3b82f6;
-        color: white;
-        border-color: #3b82f6;
-    }
-
-    /* Responsive chart container */
-    #salesChart {
-        width: 100%;
-        height: 400px;
-        margin-top: 2rem;
-    }
-</style>
-
-<div class="container mx-auto p-6">
-    <h2 class="text-2xl font-bold mb-4">Sales</h2>
-
-    @if(session('success'))
-        <div class="mb-4 text-green-600">{{ session('success') }}</div>
+<div class="card">
+    <div class="card-header d-flex align-items-center gap-2 py-3">
+        <i class="bi bi-table text-primary"></i>
+        <span class="fw-semibold">Sales Records</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background:var(--primary-navy);">
+                    <tr>
+                        <th class="text-white px-4 py-3">Date</th>
+                        <th class="text-white px-4 py-3">Pump</th>
+                        <th class="text-white px-4 py-3">Fuel</th>
+                        <th class="text-white px-4 py-3">Litres</th>
+                        <th class="text-white px-4 py-3">Amount (TSH)</th>
+                        <th class="text-white px-4 py-3">Attendant</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($sales as $sale)
+                    <tr>
+                        <td class="px-4 py-3" style="font-size:13px;">{{ $sale->created_at->format('Y-m-d H:i') }}</td>
+                        <td class="px-4 py-3 fw-semibold">{{ optional($sale->pump)->name }}</td>
+                        <td class="px-4 py-3">
+                            <span class="badge rounded-pill bg-secondary">{{ optional($sale->pump)->fuel_type ?? 'N/A' }}</span>
+                        </td>
+                        <td class="px-4 py-3">{{ $sale->litres_sold }} L</td>
+                        <td class="px-4 py-3 fw-semibold" style="color:var(--success-green);">{{ number_format($sale->amount, 2) }}</td>
+                        <td class="px-4 py-3">{{ optional($sale->user)->name }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>No sales found
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @if(isset($sales) && method_exists($sales, 'links'))
+    <div class="card-footer bg-white px-4 py-3">
+        {{ $sales->links() }}
+    </div>
     @endif
-
-    <table class="table-auto border-collapse border border-gray-300 w-full">
-        <thead>
-            <tr>
-                <th class="border px-4 py-2">Date</th>
-                <th class="border px-4 py-2">Pump</th>
-                <th class="border px-4 py-2">Fuel</th>
-                <th class="border px-4 py-2">Litres</th>
-                <th class="border px-4 py-2">Amount</th>
-                <th class="border px-4 py-2">Attendant</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($sales as $sale)
-            <tr>
-                <td class="border px-4 py-2">{{ $sale->created_at->format('Y-m-d H:i') }}</td>
-                <td class="border px-4 py-2">{{ optional($sale->pump)->name }}</td>
-                <td class="border px-4 py-2">{{ optional($sale->pump)->fuel_type ?? 'N/A' }}</td>
-                <td class="border px-4 py-2">{{ $sale->litres_sold }}</td>
-                <td class="border px-4 py-2">{{ number_format($sale->amount,2) }}</td>
-                <td class="border px-4 py-2">{{ optional($sale->user)->name }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-   
+</div>
 @endsection

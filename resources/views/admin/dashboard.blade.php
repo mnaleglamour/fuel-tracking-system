@@ -1,536 +1,374 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-:root {
-    --primary: #0f172a;
-    --secondary: #1e293b;
-    --accent: #2563eb;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --bg: #f1f5f9;
-    --card-bg: #ffffff;
-    --muted: #64748b;
-    --border: #e5e7eb;
-}
+<div class="page-header d-flex justify-content-between align-items-start flex-wrap gap-3">
+    <div>
+        <h1><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h1>
+        <p>Overview of sales, fuel stock, recent activity &amp; government cap prices</p>
+    </div>
+    <span class="text-muted" style="font-size:13px;"><i class="bi bi-calendar3 me-1"></i>{{ now()->format('d M Y') }}</span>
+</div>
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<div class="row g-4 mb-4">
 
-body {
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    padding: 20px;
-    color: var(--secondary);
-}
-
-.dashboard-container {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* ================= HEADER ================= */
-.header-content h1 {
-    font-size: 32px;
-    color: var(--primary);
-    font-weight: 800;
-}
-
-.header-content p {
-    color: var(--muted);
-    font-size: 14px;
-}
-
-/* ================= BUTTONS ================= */
-.btn {
-    padding: 10px 20px;
-    font-size: 13px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.25s;
-    border: none;
-}
-
-.btn-primary {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-}
-
-.btn-secondary {
-    background: #fff;
-    color: var(--accent);
-    border: 2px solid var(--accent);
-}
-
-/* ================= STAT CARDS ================= */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.stat-card {
-    background: var(--card-bg);
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
-    transition: .3s;
-    border-left: 6px solid var(--accent);
-}
-
-.stat-card:hover {
-    transform: translateY(-6px);
-}
-
-.stat-card.litres { border-left-color: var(--success); }
-.stat-card.fuels  { border-left-color: var(--warning); }
-
-.stat-label {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: var(--muted);
-    letter-spacing: .5px;
-}
-
-.stat-value {
-    font-size: 30px;
-    font-weight: 800;
-    color: var(--primary);
-}
-
-/* ================= CARDS ================= */
-.card {
-    background: var(--card-bg);
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.08);
-    margin-bottom: 20px;
-}
-
-.card-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 20px;
-    position: relative;
-    padding-left: 12px;
-}
-
-.card-title::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 2px;
-    width: 4px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 4px;
-}
-
-/* ================= INPUTS ================= */
-input[type="date"], input[type="file"] {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    font-size: 13px;
-}
-
-input[type="date"]:focus, input[type="file"]:focus {
-    outline: none;
-    border-color: var(--accent);
-}
-
-/* ================= SMALL BUTTONS ================= */
-.btn-small {
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    background: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-small.apply {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-}
-
-/* ================= FUEL LIST ================= */
-.fuel-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 14px;
-    border-radius: 10px;
-    background: #f8fafc;
-    border-left: 4px solid var(--accent);
-    transition: .25s;
-}
-
-.fuel-item:hover {
-    background: #eef2ff;
-    transform: translateX(6px);
-}
-
-.fuel-name {
-    font-weight: 600;
-}
-
-.fuel-price {
-    font-size: 12px;
-    color: var(--muted);
-}
-
-.fuel-stock {
-    font-weight: 800;
-    color: var(--success);
-}
-
-/* ================= TABLE ================= */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.table thead {
-    background: var(--primary);
-    color: #fff;
-}
-
-.table thead th {
-    padding: 14px;
-}
-
-.table tbody tr {
-    border-bottom: 1px solid var(--border);
-}
-
-.table tbody tr:hover {
-    background: #f1f5ff;
-}
-
-.table tbody td {
-    padding: 12px;
-}
-
-/* ================= PAGINATION ================= */
-.pagination {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid var(--border);
-}
-
-.pagination-buttons button {
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    background: #fff;
-    font-weight: 600;
-}
-
-.pagination-buttons button:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
-/* ================= NO DATA ================= */
-.no-data {
-    text-align: center;
-    padding: 30px;
-    color: var(--muted);
-}
-</style>
-
-<div class="dashboard-container">
-    <div class="header-section">
-        <div class="header-content">
-            <h1>Welcome</h1>
-            <p>Overview of sales, fuel stock, recent activity & government cap</p>
+    <div class="col-lg-4">
+        <div class="row g-3 h-100">
+            <div class="col-12">
+                <div class="card h-100">
+                    <div class="card-body text-center p-3">
+                        <i class="bi bi-pie-chart fs-1 text-primary mb-2 opacity-75"></i>
+                        <h5 class="fw-bold text-primary mb-1">{{ $pumps->count() }}</h5>
+                        <p class="text-muted mb-0 small">Total Pumps</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card sales">
-            <div class="stat-label">Total Sales</div>
-            <div class="stat-value">{{ number_format($totalSales,2) }}</div>
-        </div>
-
-        <div class="stat-card litres">
-            <div class="stat-label">Total Litres</div>
-            <div class="stat-value">{{ $totalLitres }} L</div>
-        </div>
-
-        <div class="stat-card fuels">
-            <div class="stat-label">Total Pumps</div>
-            <div class="stat-value">{{ $pumps->count() }}</div>
+    <div class="col-md-4">
+        <div class="card stat-card border-start border-primary border-4 h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:56px;height:56px;background:rgba(37,99,235,0.1);flex-shrink:0;">
+                    <i class="bi bi-cash-stack fs-4 text-primary"></i>
+                </div>
+                <div>
+                    <p class="text-uppercase fw-semibold mb-1" style="font-size:11px;letter-spacing:.5px;color:var(--text-muted);">Total Sales</p>
+                    <h3 class="fw-bold mb-0" style="color:var(--primary-navy);">TSH {{ number_format($totalSales, 2) }}</h3>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- ================= FUEL STOCK (COMPACT) ================= -->
-    <div class="card" style="margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 class="card-title" style="margin: 0;">Pump Stock & Pricing by Region</h3>
-            <button id="toggleAllPumps" onclick="toggleAllPumps()" style="background: #2563eb; color: white; padding: 10px 18px; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; font-size: 13px; transition: 0.3s; cursor: pointer;">
-                📋 Show All Pumps
-            </button>
+    <div class="col-md-4">
+        <div class="card stat-card border-start border-4 h-100" style="border-color:var(--warning-amber)!important;">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:56px;height:56px;background:rgba(245,158,11,0.1);flex-shrink:0;">
+                    <i class="bi bi-fuel-pump fs-4" style="color:var(--warning-amber);"></i>
+                </div>
+                <div>
+                    <p class="text-uppercase fw-semibold mb-1" style="font-size:11px;letter-spacing:.5px;color:var(--text-muted);">Total Pumps</p>
+                    <h3 class="fw-bold mb-0" style="color:var(--primary-navy);">{{ $pumps->count() }}</h3>
+                </div>
+            </div>
         </div>
-        
-        <!-- Initial 3 Pumps -->
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-fuel-pump text-primary"></i>
+            <span class="fw-semibold">Pump Stock &amp; Pricing by Region</span>
+        </div>
+        <button id="toggleAllPumps" onclick="toggleAllPumps()" class="btn btn-primary btn-sm">
+            <i class="bi bi-list-ul me-1"></i>Show All Pumps
+        </button>
+    </div>
+    <div class="card-body">
         <div id="initialPumps">
-            <p style="color: #64748b; font-size: 12px; margin-bottom: 15px;"></p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+            <div class="row g-3">
                 @forelse($pumps->take(3) as $pump)
                     @php
                         $capPrice = $pump->cap_price ?? null;
                         $isAboveCap = $capPrice && $pump->price_per_litre > $capPrice;
                         $isLowStock = !is_null($pump->low_stock_threshold) && $pump->stock <= $pump->low_stock_threshold;
+                        $borderColor = $isLowStock ? 'var(--danger-red)' : ($isAboveCap ? '#f87171' : 'var(--accent-blue)');
                     @endphp
-                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 6px solid {{ $isLowStock ? '#ef4444' : ($isAboveCap ? '#f87171' : '#2563eb') }};">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b; font-size: 15px;">{{ $pump->name }}</div>
-                                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">📍 {{ $pump->region ?? 'No Region' }}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 13px; color: #64748b; background: #e2e8f0; padding: 4px 10px; border-radius: 4px; font-weight: 600;">{{ $pump->fuel_type }}</div>
-                            </div>
-                        </div>
-                        <div style="background: #ffffff; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="font-size: 12px; color: #64748b;">Current Stock:</span>
-                                <span style="font-weight: 700; color: {{ $isLowStock ? '#ef4444' : '#059669' }}; font-size: 16px;">{{ number_format($pump->stock, 0) }} L</span>
-                            </div>
-                            @if($pump->low_stock_threshold)
-                                <div style="font-size: 11px; color: #64748b;">
-                                    Threshold: {{ $pump->low_stock_threshold }} L
-                                    @if($isLowStock)
-                                        <span style="color: rgb(68, 188, 239); font-weight: 600;"> ⚠️ LOW</span>
-                                    @endif
+                    <div class="col-md-4">
+                        <div class="rounded-3 p-3" style="background:#f8fafc;border-left:5px solid {{ $borderColor }};">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="fw-bold" style="color:var(--primary-navy);">{{ $pump->name }}</div>
+                                    <div style="font-size:12px;color:var(--text-muted);"><i class="bi bi-geo-alt me-1"></i>{{ $pump->region ?? 'No Region' }}</div>
                                 </div>
-                            @endif
-                        </div>
-                        <div style="border-top: 1px solid #e5e7eb; padding-top: 10px;">
-                            <div style="margin-bottom: 8px;">
-                                <div style="font-size: 12px; color: #64748b; margin-bottom: 3px;">Current Price:</div>
-                                <div style="font-weight: 700; color: #1e293b; font-size: 16px;">TSH {{ number_format($pump->price_per_litre, 2) }}/L</div>
+                                <span class="badge bg-secondary rounded-pill">{{ $pump->fuel_type }}</span>
                             </div>
-                            @if($capPrice)
-                                <div style="background: {{ $isAboveCap ? '#dbeafe' : '#dbeafe' }}; padding: 8px 10px; border-radius: 4px; margin-top: 8px;">
-                                    <div style="font-size: 11px; color: {{ $isAboveCap ? '#0c4a6e' : '#0c4a6e' }}; margin-bottom: 2px;">Cap Price: TSH {{ number_format($capPrice, 2) }}/L</div>
-                                    <div style="font-size: 12px; font-weight: 600; color: #059669;">
-                                        @if($isAboveCap)
-                                            ✅ ABOVE CAP ({{ number_format($pump->price_per_litre - $capPrice, 2) }} over)
-                                        @else
-                                            ✅ WITHIN CAP ({{ number_format($capPrice - $pump->price_per_litre, 2) }} below)
+                            <div class="rounded-2 p-2 mb-2" style="background:#fff;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Current Stock:</small>
+                                    <span class="fw-bold" style="color:{{ $isLowStock ? 'var(--danger-red)' : 'var(--success-green)' }};font-size:15px;">
+                                        {{ number_format($pump->stock, 0) }} L
+                                    </span>
+                                </div>
+                                @if($pump->low_stock_threshold)
+                                    <div style="font-size:11px;color:var(--text-muted);">
+                                        Threshold: {{ $pump->low_stock_threshold }} L
+                                        @if($isLowStock)
+                                            <span class="badge bg-danger ms-1">LOW</span>
                                         @endif
                                     </div>
-                                </div>
-                            @else
-                                <div style="font-size: 12px; color: #9ca3af; padding: 8px 10px; background: #f3f4f6; border-radius: 4px; margin-top: 8px;"><em>ℹ️ No cap price data available</em></div>
+                                @endif
+                            </div>
+                            <div style="border-top:1px solid #e5e7eb;padding-top:10px;">
+                                <div style="font-size:12px;color:var(--text-muted);">Current Price:</div>
+                                <div class="fw-bold" style="font-size:15px;color:var(--primary-navy);">TSH {{ number_format($pump->price_per_litre, 2) }}/L</div>
+                                @if($capPrice)
+                                    <div class="rounded-2 p-2 mt-2" style="background:#dbeafe;font-size:11px;">
+                                        <div style="color:#0c4a6e;">Cap Price: TSH {{ number_format($capPrice, 2) }}/L</div>
+                                        <div class="fw-semibold" style="color:var(--success-green);">
+                                            @if($isAboveCap) ABOVE CAP (+{{ number_format($pump->price_per_litre - $capPrice, 2) }})
+                                            @else WITHIN CAP (-{{ number_format($capPrice - $pump->price_per_litre, 2) }}) @endif
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="rounded-2 p-2 mt-2" style="background:#f3f4f6;font-size:11px;color:#9ca3af;"><em>No cap price data</em></div>
+                                @endif
+                            </div>
+                            @if($pump->code)
+                                <div class="mt-2" style="font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:8px;">Code: <strong>{{ $pump->code }}</strong></div>
                             @endif
                         </div>
-                        @if($pump->code)
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af;">Code: <strong>{{ $pump->code }}</strong></div>
-                        @endif
                     </div>
                 @empty
-                    <p style="color: #6b7280; grid-column: 1/-1;">No pumps in the system</p>
+                    <div class="col-12 text-center py-4 text-muted">
+                        <i class="bi bi-fuel-pump fs-3 d-block mb-2"></i>No pumps in the system
+                    </div>
                 @endforelse
             </div>
         </div>
 
-        <!-- All Pumps (Hidden by default) -->
-        <div id="allPumpsSection" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <p style="color: #64748b; font-size: 12px; margin: 0;">Showing all {{ $pumps->count() }} pumps</p>
-                <button onclick="toggleAllPumps()" style="background: #6b7280; color: white; padding: 8px 15px; border-radius: 8px; font-weight: 600; border: none; font-size: 12px; cursor: pointer;">
-                    ✕ Hide
+        <div id="allPumpsSection" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <small class="text-muted">Showing all {{ $pumps->count() }} pumps</small>
+                <button onclick="toggleAllPumps()" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-x-lg me-1"></i>Hide
                 </button>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+            <div class="row g-3">
                 @forelse($pumps as $pump)
                     @php
                         $capPrice = $pump->cap_price ?? null;
                         $isAboveCap = $capPrice && $pump->price_per_litre > $capPrice;
                         $isLowStock = !is_null($pump->low_stock_threshold) && $pump->stock <= $pump->low_stock_threshold;
+                        $borderColor = $isLowStock ? 'var(--danger-red)' : ($isAboveCap ? '#f87171' : 'var(--accent-blue)');
                     @endphp
-                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 6px solid {{ $isLowStock ? '#ef4444' : ($isAboveCap ? '#f87171' : '#2563eb') }};">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                            <div>
-                                <div style="font-weight: 700; color: #1e293b; font-size: 15px;">{{ $pump->name }}</div>
-                                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">📍 {{ $pump->region ?? 'No Region' }}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 13px; color: #64748b; background: #e2e8f0; padding: 4px 10px; border-radius: 4px; font-weight: 600;">{{ $pump->fuel_type }}</div>
-                            </div>
-                        </div>
-                        <div style="background: #ffffff; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="font-size: 12px; color: #64748b;">Current Stock:</span>
-                                <span style="font-weight: 700; color: {{ $isLowStock ? '#ef4444' : '#059669' }}; font-size: 16px;">{{ number_format($pump->stock, 0) }} L</span>
-                            </div>
-                            @if($pump->low_stock_threshold)
-                                <div style="font-size: 11px; color: #64748b;">
-                                    Threshold: {{ $pump->low_stock_threshold }} L
-                                    @if($isLowStock)
-                                        <span style="color: #ef4444; font-weight: 600;"> ⚠️ LOW</span>
-                                    @endif
+                    <div class="col-md-4">
+                        <div class="rounded-3 p-3" style="background:#f8fafc;border-left:5px solid {{ $borderColor }};">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="fw-bold" style="color:var(--primary-navy);">{{ $pump->name }}</div>
+                                    <div style="font-size:12px;color:var(--text-muted);"><i class="bi bi-geo-alt me-1"></i>{{ $pump->region ?? 'No Region' }}</div>
                                 </div>
-                            @endif
-                        </div>
-                        <div style="border-top: 1px solid #e5e7eb; padding-top: 10px;">
-                            <div style="margin-bottom: 8px;">
-                                <div style="font-size: 12px; color: #64748b; margin-bottom: 3px;">Current Price:</div>
-                                <div style="font-weight: 700; color: #1e293b; font-size: 16px;">TSH {{ number_format($pump->price_per_litre, 2) }}/L</div>
+                                <span class="badge bg-secondary rounded-pill">{{ $pump->fuel_type }}</span>
                             </div>
-                            @if($capPrice)
-                                <div style="background: {{ $isAboveCap ? '#dbeafe' : '#dbeafe' }}; padding: 8px 10px; border-radius: 4px; margin-top: 8px;">
-                                    <div style="font-size: 11px; color: {{ $isAboveCap ? '#0c4a6e' : '#0c4a6e' }}; margin-bottom: 2px;">Cap Price: TSH {{ number_format($capPrice, 2) }}/L</div>
-                                    <div style="font-size: 12px; font-weight: 600; color: #059669;">
-                                        @if($isAboveCap)
-                                            ✅ ABOVE CAP ({{ number_format($pump->price_per_litre - $capPrice, 2) }} over)
-                                        @else
-                                            ✅ WITHIN CAP ({{ number_format($capPrice - $pump->price_per_litre, 2) }} below)
-                                        @endif
+                            <div class="rounded-2 p-2 mb-2" style="background:#fff;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Current Stock:</small>
+                                    <span class="fw-bold" style="color:{{ $isLowStock ? 'var(--danger-red)' : 'var(--success-green)' }};font-size:15px;">
+                                        {{ number_format($pump->stock, 0) }} L
+                                    </span>
+                                </div>
+                                @if($pump->low_stock_threshold)
+                                    <div style="font-size:11px;color:var(--text-muted);">
+                                        Threshold: {{ $pump->low_stock_threshold }} L
+                                        @if($isLowStock) <span class="badge bg-danger ms-1">LOW</span> @endif
                                     </div>
-                                </div>
-                            @else
-                                <div style="font-size: 12px; color: #9ca3af; padding: 8px 10px; background: #f3f4f6; border-radius: 4px; margin-top: 8px;"><em>ℹ️ No cap price data available</em></div>
+                                @endif
+                            </div>
+                            <div style="border-top:1px solid #e5e7eb;padding-top:10px;">
+                                <div style="font-size:12px;color:var(--text-muted);">Current Price:</div>
+                                <div class="fw-bold" style="font-size:15px;color:var(--primary-navy);">TSH {{ number_format($pump->price_per_litre, 2) }}/L</div>
+                                @if($capPrice)
+                                    <div class="rounded-2 p-2 mt-2" style="background:#dbeafe;font-size:11px;">
+                                        <div style="color:#0c4a6e;">Cap: TSH {{ number_format($capPrice, 2) }}/L</div>
+                                        <div class="fw-semibold" style="color:var(--success-green);">
+                                            @if($isAboveCap) ABOVE (+{{ number_format($pump->price_per_litre - $capPrice, 2) }})
+                                            @else WITHIN (-{{ number_format($capPrice - $pump->price_per_litre, 2) }}) @endif
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="rounded-2 p-2 mt-2" style="background:#f3f4f6;font-size:11px;color:#9ca3af;"><em>No cap data</em></div>
+                                @endif
+                            </div>
+                            @if($pump->code)
+                                <div class="mt-2" style="font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:8px;">Code: <strong>{{ $pump->code }}</strong></div>
                             @endif
                         </div>
-                        @if($pump->code)
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af;">Code: <strong>{{ $pump->code }}</strong></div>
-                        @endif
                     </div>
                 @empty
-                    <p style="color: #6b7280; grid-column: 1/-1;">No pumps in the system</p>
+                    <div class="col-12 text-center py-4 text-muted"><i class="bi bi-fuel-pump fs-3 d-block mb-2"></i>No pumps found</div>
                 @endforelse
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function toggleAllPumps() {
-            const initialPumps = document.getElementById('initialPumps');
-            const allPumpsSection = document.getElementById('allPumpsSection');
-            const toggleBtn = document.getElementById('toggleAllPumps');
-
-            if (allPumpsSection.style.display === 'none') {
-                initialPumps.style.display = 'none';
-                allPumpsSection.style.display = 'block';
-                toggleBtn.textContent = '📋 Show Less';
-            } else {
-                initialPumps.style.display = 'block';
-                allPumpsSection.style.display = 'none';
-                toggleBtn.textContent = '📋 Show All Pumps';
-            }
-        }
-    </script>
-
-    <!-- ================= LOW STOCK ALERTS ================= -->
-    @if(!empty($lowStockPumps) && $lowStockPumps->count())
-    <div class="card mb-4">
-        <h3 class="card-title">Low Stock Alerts</h3>
-        <div class="fuel-list">
+@if(!empty($lowStockPumps) && $lowStockPumps->count())
+<div class="card mb-4 border-start border-danger border-4">
+    <div class="card-header d-flex align-items-center gap-2 py-3">
+        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+        <span class="fw-semibold text-danger">Low Stock Alerts</span>
+        <span class="badge bg-danger ms-1">{{ $lowStockPumps->count() }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
             @foreach($lowStockPumps as $lp)
-                @php
-                    $capPrice = $lp->cap_price ?? null;
-                    $isAboveCap = $capPrice && $lp->price_per_litre > $capPrice;
-                @endphp
-                <div class="fuel-item" style="border-left-color: {{ $isAboveCap ? '#f87171' : '#2563eb' }};">
-                    <div class="fuel-info">
-                        <div class="fuel-name">{{ $lp->name }} {{ $lp->code ? '('.$lp->code.')' : '' }}</div>
-                        <div class="fuel-price">
-                            {{ number_format($lp->price_per_litre,2) }} / L
+                @php $capPrice = $lp->cap_price ?? null; $isAboveCap = $capPrice && $lp->price_per_litre > $capPrice; @endphp
+                <div class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                    <div>
+                        <span class="fw-semibold">{{ $lp->name }} {{ $lp->code ? '('.$lp->code.')' : '' }}</span>
+                        <div style="font-size:12px;color:var(--text-muted);">
+                            TSH {{ number_format($lp->price_per_litre, 2) }}/L
                             @if($capPrice)
-                                <span style="font-size:11px; color: {{ $isAboveCap ? '#b91c1c' : '#64748b' }}">
-                                    (Cap: {{ number_format($capPrice,2) }})
+                                <span style="color:{{ $isAboveCap ? 'var(--danger-red)' : 'var(--text-muted)' }}">
+                                    &bull; Cap: TSH {{ number_format($capPrice, 2) }}
                                 </span>
                             @endif
                         </div>
                     </div>
-                    <div class="fuel-stock">{{ $lp->stock }} L</div>
-                    <div class="ml-3">
-                        <a href="{{ route('admin.pumps.edit', $lp) }}" class="text-indigo-600 hover:underline">Manage</a>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-danger rounded-pill">{{ $lp->stock }} L</span>
+                        <a href="{{ route('admin.pumps.edit', $lp) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil me-1"></i>Manage
+                        </a>
                     </div>
                 </div>
             @endforeach
         </div>
     </div>
-    @endif
+</div>
+@endif
 
-    <!-- ================= RECENT SALES ================= -->
-    <h3 class="card-title">Recent Sales</h3>
-    <div class="table-container">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Pump</th>
-                    <th>Fuel</th>
-                    <th>Price/L(TSH)</th>
-                    <th>Litres</th>
-                    <th>Amount(TSH)</th>
-                    <th>Attendant</th>
-                </tr>
-            </thead>
-            <tbody id="recentSalesBody">
-                @forelse($sales as $sale)
-                <tr>
-                    <td>{{ $sale->created_at->format('Y-m-d H:i') }}</td>
-                    <td>{{ optional($sale->pump)->name }} {{ optional($sale->pump)->code ? '('.optional($sale->pump)->code.')' : '' }}</td>
-                    <td>{{ optional($sale->pump)->fuel_type }}</td>
-                    <td>{{number_format(optional($sale->pump)->price_per_litre ?? 0, 2) }}</td>
-                    <td>{{ $sale->litres_sold }}</td>
-                    <td>{{ number_format($sale->amount,2) }}</td>
-                    <td>{{ optional($sale->user)->name }}</td>
-                </tr>
-                @empty
-                <tr><td colspan="7" class="no-data">No recent sales</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+<div class="card mb-4">
+    <div class="card-header d-flex align-items-center gap-2 py-3">
+        <i class="bi bi-graph-up text-primary"></i>
+        <span class="fw-semibold">Recent Sales</span>
     </div>
+    <div class="card-body p-0">
+    <div class="table-responsive">
+            <table id="adminSalesTable" class="table table-hover mb-0" style="width:100%">
+                <thead style="background:var(--primary-navy);">
+                    <tr>
+                        <th>Date</th>
+                        <th>Pump</th>
+                        <th>Fuel</th>
+                        <th>Price/L</th>
+                        <th>Litres</th>
+                        <th class="text-end">Amount</th>
+                        <th>Attendant</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($sales as $sale)
+                    <tr>
+                        <td>{{ $sale->created_at->format('Y-m-d H:i') }}</td>
+                        <td>
+                            {{ optional($sale->pump)->name }}
+                            @if(optional($sale->pump)->code)
+                                <small class="text-muted">({{ $sale->pump->code }})</small>
+                            @endif
+                        </td>
+                        <td><span class="badge rounded-pill bg-secondary">{{ optional($sale->pump)->fuel_type }}</span></td>
+                        <td>{{ number_format(optional($sale->pump)->price_per_litre ?? 0, 2) }}</td>
+                        <td>{{ $sale->litres_sold }} L</td>
+                        <td class="text-end fw-bold" style="color:var(--success-green);">{{ number_format($sale->amount, 2) }}</td>
+                        <td>{{ optional($sale->user)->name }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>No recent sales
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-    <div class="pagination">
-        <div class="pagination-info" id="recentSalesInfo">&nbsp;</div>
-        <div class="pagination-buttons">
-            <button id="recentPrev">← Previous</button>
-            <button id="recentNext">Next →</button>
+        <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-top:1px solid var(--border-color);">
+            <span class="text-muted" style="font-size:13px;" id="recentSalesInfo">&nbsp;</span>
+            <div class="btn-group btn-group-sm">
+                <button id="recentPrev" class="btn btn-outline-secondary"><i class="bi bi-chevron-left"></i> Prev</button>
+                <button id="recentNext" class="btn btn-outline-secondary">Next <i class="bi bi-chevron-right"></i></button>
+            </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-const ctx = document.getElementById('adminSalesChart').getContext('2d');
-const adminSalesChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: {!! json_encode($dates) !!},
-        datasets: [
-            { label: 'Sales Amount (TSH)', data: {!! json_encode($chartAmounts) !!}, yAxisID: 'y-amount', borderColor: '#3b82f6', backgroundColor: '#3b82f6', fill: false, tension: 0.15, pointRadius: 2 },
-            { label: 'Litres Sold (L)', data: {!! json_encode($chartLitres) !!}, yAxisID: 'y-litres', borderColor: '#10b981', backgroundColor: '#10b981', fill: false, tension: 0.15, pointRadius: 2 }
-        ]
-    },
-    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { 'y-amount': { type: 'linear', position: 'left', min: 0, title: { display: true, text: 'TSH' } }, 'y-litres': { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Litres' } } }, plugins: { legend: { position: 'top' } } }
+document.addEventListener('DOMContentLoaded', function() {
+    // Admin Sales Chart
+    const adminCtx = document.getElementById('adminSalesChart')?.getContext('2d');
+    if (adminCtx) {
+        const dates = @json($dates ?? []);
+        const amounts = @json($chartAmounts ?? []);
+        const litres = @json($chartLitres ?? []);
+        if (dates.length > 0) {
+            new Chart(adminCtx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Sales (TSH)',
+                        data: amounts,
+                        borderColor: 'rgb(37, 99, 235)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        yAxisID: 'y',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Litres',
+                        data: litres,
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'nearest', intersect: false },
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(0,0,0,0.05)' } },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Sales (TSH)', color: 'rgb(37, 99, 235)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: 'Litres (L)', color: 'rgb(16, 185, 129)' }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Admin Recent Sales DataTable
+    $('#adminSalesTable').DataTable({
+        responsive: true,
+        pageLength: 10,
+        dom: 'Bfrtip',
+        order: [[0, 'desc']],
+        columnDefs: [{ targets: 0, type: 'datetime' }, { targets: 5, className: 'text-end' }],
+        buttons: ['copy', 'csv', 'excel', 'colvis']
+    });
 });
+
+function toggleAllPumps() {
+    const initialPumps = document.getElementById('initialPumps');
+
+    const allPumpsSection = document.getElementById('allPumpsSection');
+    const toggleBtn = document.getElementById('toggleAllPumps');
+    if (allPumpsSection.style.display === 'none') {
+        initialPumps.style.display = 'none';
+        allPumpsSection.style.display = 'block';
+        toggleBtn.innerHTML = '<i class="bi bi-list-ul me-1"></i>Show Less';
+    } else {
+        initialPumps.style.display = 'block';
+        allPumpsSection.style.display = 'none';
+        toggleBtn.innerHTML = '<i class="bi bi-list-ul me-1"></i>Show All Pumps';
+    }
+}
 </script>
 @endsection

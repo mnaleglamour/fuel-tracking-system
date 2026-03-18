@@ -92,8 +92,11 @@ class DashboardController extends Controller
                 'totalLitres',
                 'dates',
                 'chartAmounts',
-                'chartLitres'
+                'chartLitres',
+                'startDate',
+                'endDate'
             ));
+
         }
 
         /* ================= ATTENDANT ================= */
