@@ -23,11 +23,11 @@ class LowStockNotification extends Notification
     }
 
     /**
-     * Channels used
+     * Get the notification channels.
      */
     public function via($notifiable)
     {
-        return ['mail']; // SMS is triggered manually
+        return ['mail', 'database']; // SMS is triggered manually
     }
 
     /**
@@ -46,7 +46,22 @@ class LowStockNotification extends Notification
     }
 
     /**
-     * REAL SMS (Africa’s Talking)
+     * Get the array representation of the notification for database storage.
+     */
+    public function toArray($notifiable)
+    {
+        return [
+            'pump' => [
+                'name' => $this->pump->name,
+                'id' => $this->pump->id,
+            ],
+            'remaining' => $this->remaining,
+            'attempted' => $this->attempted,
+        ];
+    }
+
+    /**
+     * REAL SMS (Africa's Talking)
      */
     public function sendSms($phone)
     {
@@ -62,3 +77,4 @@ class LowStockNotification extends Notification
         $sms->send($phone, $message);
     }
 }
+

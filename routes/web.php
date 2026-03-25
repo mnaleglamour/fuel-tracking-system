@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PumpShiftController;
 use App\Http\Controllers\GovernmentCapController;
 use App\Http\Controllers\CapController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -94,6 +95,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/shifts/{shift}/download-pdf', [PumpShiftController::class, 'downloadPdf'])
         ->name('shifts.download-pdf');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 });
 
 

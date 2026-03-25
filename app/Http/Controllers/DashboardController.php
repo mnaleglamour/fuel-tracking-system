@@ -84,6 +84,8 @@ class DashboardController extends Controller
                 return !is_null($p->low_stock_threshold) && $p->stock <= $p->low_stock_threshold;
             })->values();
 
+            $unreadNotifications = $user->unreadNotifications()->count();
+
             return view('admin.dashboard', compact(
                 'pumps',
                 'lowStockPumps',
@@ -92,7 +94,8 @@ class DashboardController extends Controller
                 'totalLitres',
                 'dates',
                 'chartAmounts',
-                'chartLitres'
+                'chartLitres',
+                'unreadNotifications'
             ));
         }
 

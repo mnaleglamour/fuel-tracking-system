@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div style="max-width: 900px; margin: 0 auto; padding: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">

@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="container mx-auto p-6">
     <h2 class="text-2xl font-bold mb-4">Users</h2>

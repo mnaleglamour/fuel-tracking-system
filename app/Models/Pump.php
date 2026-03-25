@@ -17,6 +17,13 @@ class Pump extends Model
         'price_per_litre',
         'stock',
         'low_stock_threshold',
+        'notified_at',
+    ];
+
+    protected $casts = [
+        'notified_at' => 'datetime',
+        'stock' => 'decimal:2',
+        'low_stock_threshold' => 'decimal:2',
     ];
 
     public function fuel()

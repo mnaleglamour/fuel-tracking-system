@@ -259,7 +259,12 @@ input[type="date"]:focus, input[type="file"]:focus {
 <div class="dashboard-container">
     <div class="header-section">
         <div class="header-content">
-            <h1>Welcome</h1>
+            <h1>
+                Welcome
+                @if(isset($unreadNotifications) && $unreadNotifications > 0)
+                    <span style="color:#ef4444;">({{ $unreadNotifications }} unread)</span>
+                @endif
+            </h1>
             <p>Overview of sales, fuel stock, recent activity & government cap</p>
         </div>
     </div>
@@ -284,7 +289,7 @@ input[type="date"]:focus, input[type="file"]:focus {
     <!-- ================= FUEL STOCK (COMPACT) ================= -->
     <div class="card" style="margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 class="card-title" style="margin: 0;">Pump Stock & Pricing by Region</h3>
+            <h3 class="card-title" style="margin: 0;">Pump Stock & Pricingc</h3>
             <button id="toggleAllPumps" onclick="toggleAllPumps()" style="background: #2563eb; color: white; padding: 10px 18px; border-radius: 8px; font-weight: 600; border: none; text-decoration: none; font-size: 13px; transition: 0.3s; cursor: pointer;">
                 📋 Show All Pumps
             </button>

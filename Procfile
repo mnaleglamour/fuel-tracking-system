@@ -1,1 +1,1 @@
-web: bash railway-start.sh
+web: heroku-php-apache2 public/
